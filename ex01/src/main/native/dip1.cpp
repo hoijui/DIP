@@ -66,6 +66,17 @@ int main(int argc, char** argv) {
 // function that performs some kind of (simple) image processing
 Mat doSomethingThatMyTutorIsGonnaLike(Mat& img) {
 
-	// TODO
+    int div = 64;
+    int nl = img.rows;
+    int nc = img.cols * img.channels();
+
+    for (int j=0; j<nl; j++) {
+        uchar* data = img.ptr<uchar>(j);
+        for (int i=0; i<nc; i++) {
+            data[i] = data[i]/div*div + div/2;
+        }
+    }
+
+    return img;
 }
 
