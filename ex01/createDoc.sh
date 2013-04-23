@@ -16,5 +16,5 @@ pdflatex \
 		doc.tex
 
 cd "${TARGET_DIR}"
-mv doc.pdf DIP_SS13_GruppeXXX_Ex01.pdf
+mv doc.pdf DIP_SS13_GruppeF_Ex01.pdf
 
