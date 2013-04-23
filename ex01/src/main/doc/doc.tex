@@ -1,0 +1,74 @@
+\documentclass[a4paper,headings=small]{scrartcl}
+\KOMAoptions{DIV=12}
+
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{subfigure}
+
+% define style of numbering
+\numberwithin{equation}{section} % use separate numbering per section
+\numberwithin{figure}{section}   % use separate numbering per section
+
+% instead of using indents to denote a new paragraph, we add space before it
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{10pt plus 1pt minus 1pt}
+
+\title{C++ and OpenCV}
+\subtitle{Excercise 1 \\ Digital Image Processing - SS13}
+\author{\textbf{Team XXX}: Benmekki Aouatef, Frank Ng, Robin Vobruba}
+\date{\today}
+
+\pdfinfo{%
+  /Title    (Digital Image Processing - SS13 - Excercise 1 - C++ and OpenCV)
+  /Author   (Team XXX: Benmekki Aouatef, Frank Ng, Robin Vobruba)
+  /Creator  ()
+  /Producer ()
+  /Subject  ()
+  /Keywords ()
+  %Version 1
+}
+
+% Simple picture reference
+%   Usage: \image{#1}{#2}{#3}
+%     #1: file-name of the image
+%     #2: percentual width (decimal)
+%     #3: caption/description
+%
+%   Example:
+%     \image{myPicture}{0.8}{My huge house}
+%     See fig. \ref{fig:myPicture}.
+\newcommand{\image}[3]{
+	\begin{figure}[htbp]
+		\centering
+		\includegraphics[width=#2\textwidth]{#1}
+		\caption{#3}
+		\label{fig:#1}
+	\end{figure}
+}
+\newcommand{\imgRoot}{../resources/img}
+\newcommand{\imgGeneratedRoot}{../../../target}
+
+\begin{document}
+
+\maketitle
+
+... see fig. \ref{fig:\imgRoot/input.jpg}
+... see fig. \ref{fig:\imgGeneratedRoot/output.jpg}
+
+
+\image{\imgRoot/input.jpg}{0.9}{%
+		input image}
+
+\image{\imgGeneratedRoot/output.jpg}{0.9}{%
+		output image}
+
+
+\newpage
+\section{Printed Code:}
+
+\lstinputlisting[breaklines=true]{../native/dip1.cpp}
+
+\end{document}
