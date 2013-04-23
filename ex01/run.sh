@@ -3,7 +3,7 @@
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 TARGET_DIR="${SCRIPT_DIR}/target"
 RESOURCES_DIR="${SCRIPT_DIR}/src/main/resources"
-EXECUTABLE=$(ls ${TARGET_DIR}/dip*)
+EXECUTABLE=$(ls ${TARGET_DIR}/dip1)
 
 cd "${SCRIPT_DIR}"
 
