@@ -73,7 +73,7 @@ Mat doSomethingThatMyTutorIsGonnaLike(Mat& img) {
     for (int j=0; j<nl; j++) {
         uchar* data = img.ptr<uchar>(j);
         for (int i=0; i<nc; i++) {
-            data[i] = data[i]/div*div + div/2;
+            data[i] = (data[i] / div * div) + (div / 2);
         }
     }
 
