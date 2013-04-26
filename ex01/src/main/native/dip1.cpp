@@ -66,13 +66,13 @@ int main(int argc, char** argv) {
 // function that performs some kind of (simple) image processing
 Mat doSomethingThatMyTutorIsGonnaLike(Mat& img) {
 
-	int div = 64;
-	int nl = img.rows;
-	int nc = img.cols * img.channels();
+	const int div = 64;
+	const int nl = img.rows;
+	const int nc = img.cols * img.channels();
 
-	for (int j = 0; j < nl; j++) {
+	for (int j = 0; j < nl; ++j) {
 		uchar* data = img.ptr<uchar>(j);
-		for (int i=0; i<nc; i++) {
+		for (int i = 0; i < nc; ++i) {
 			data[i] = (data[i] / div * div) + (div / 2);
 		}
 	}
