@@ -14,8 +14,8 @@ fi
 if [ ! -f "${RESOURCES_DIR}/img/input.jpg" ]; then
 	mkdir -p "${RESOURCES_DIR}/img"
 	cd "${RESOURCES_DIR}/img/"
-	wget "http://images.paraorkut.com/img/wallpapers/1024x768/t/tiger_rabbit-7532.jpg"
-	mv tiger*.jpg input.jpg
+	wget "http://img3.etsystatic.com/000/0/6386326/il_fullxfull.300866075.jpg"
+	mv *.jpg input.jpg
 fi
 
 cd "${TARGET_DIR}"
