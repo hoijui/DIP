@@ -72,6 +72,22 @@ fig. \ref{fig:inOutImg}).
 \newpage
 \section{Source Code:}
 
-\lstinputlisting[breaklines=true]{../native/dip1.cpp}
+\begin{lstlisting}[label=interstingFunction,caption=The function with the color-reduction code.]
+Mat doSomethingThatMyTutorIsGonnaLike(Mat& img) {
+
+	int div = 64;
+	int nl = img.rows;
+	int nc = img.cols * img.channels();
+
+	for (int j = 0; j < nl; j++) {
+		uchar* data = img.ptr<uchar>(j);
+		for (int i=0; i<nc; i++) {
+			data[i] = (data[i] / div * div) + (div / 2);
+		}
+	}
+
+	return img;
+}
+\end{lstlisting}
 
 \end{document}
