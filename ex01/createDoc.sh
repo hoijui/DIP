@@ -6,7 +6,7 @@ DOC_DIR="${SCRIPT_DIR}/src/main/doc"
 
 cd "${SCRIPT_DIR}"
 
-./run.sh
+#./run.sh
 
 cd "${DOC_DIR}"
 pdflatex \
