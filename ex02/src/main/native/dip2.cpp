@@ -14,14 +14,14 @@ using namespace std;
 using namespace cv;
 
 // function headers of functions to be implemented
-Mat spatialConvolution(Mat&, Mat&);
-Mat averageFilter(Mat& src, int kSize);
-Mat medianFilter(Mat& src, int kSize);
-Mat adaptiveFilter(Mat& src, int kSize, double threshold);
-Mat bilateralFilter(Mat& src, int kSize, double sigma);
+Mat spatialConvolution(const Mat&, const Mat&);
+Mat averageFilter(const Mat& src, int kSize);
+Mat medianFilter(const Mat& src, int kSize);
+Mat adaptiveFilter(const Mat& src, int kSize, double threshold);
+Mat bilateralFilter(const Mat& src, int kSize, double sigma);
 // function headers of given functions
 Mat noiseReduction(Mat&, string, int, double=0);
-void generateNoisyImages(Mat&);
+void generateNoisyImages(const Mat&);
 
 // usage: argv[1] == "generate" to generate noisy images, path to original image in argv[2]
 // 	  argv[1] == "restorate" to load and restorate noisy images
@@ -104,7 +104,7 @@ int main(int argc, char** argv) {
 // src: input image
 // kSize: window size used by local average
 // return: filtered image
-Mat averageFilter(Mat& src, int kSize) {
+Mat averageFilter(const Mat& src, int kSize) {
 
 	// TODO
 	return src.clone();
@@ -114,7 +114,7 @@ Mat averageFilter(Mat& src, int kSize) {
 // src: input image
 // kSize: window size used by local average
 // return: filtered image
-Mat adaptiveFilter(Mat& src, int kSize, double threshold) {
+Mat adaptiveFilter(const Mat& src, int kSize, double threshold) {
 
 	// TODO
 	return src.clone();
@@ -124,7 +124,7 @@ Mat adaptiveFilter(Mat& src, int kSize, double threshold) {
 // src: input image
 // kSize: window size used by median operation
 // return: filtered image
-Mat medianFilter(Mat& src, int kSize) {
+Mat medianFilter(const Mat& src, int kSize) {
 
 	// TODO
 	return src.clone();
@@ -135,7 +135,7 @@ Mat medianFilter(Mat& src, int kSize) {
 // kSize: window size of kernel --> used to compute std-dev of spatial kernel
 // sigma: standard-deviation of radiometric kernel
 // return: filtered image
-Mat bilateralFilter(Mat& src, int kSize, double sigma) {
+Mat bilateralFilter(const Mat& src, int kSize, double sigma) {
 
 	// TODO
 	return src.clone();
@@ -145,7 +145,7 @@ Mat bilateralFilter(Mat& src, int kSize, double sigma) {
 // src: input image
 // kernel: filter kernel
 // return: convolution result
-Mat spatialConvolution(Mat& src, Mat& kernel) {
+Mat spatialConvolution(const Mat& src, const Mat& kernel) {
 
 	// TODO
 	return src.clone();
@@ -190,7 +190,7 @@ Mat noiseReduction(Mat& src, string method, int kSize, double param) {
 
 // generates and saves different noisy versions of input image
 // orig: input image
-void generateNoisyImages(Mat& orig) {
+void generateNoisyImages(const Mat& orig) {
 
 	// save original
 	imwrite("original.jpg", orig);
