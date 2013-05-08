@@ -14,7 +14,7 @@ fi
 if [ ! -f "${RESOURCES_DIR}/img/input.jpg" ]; then
 	mkdir -p "${RESOURCES_DIR}/img"
 	cd "${RESOURCES_DIR}/img/"
-	wget "http://img3.etsystatic.com/000/0/6386326/il_fullxfull.300866075.jpg"
+	wget "http://www.lolhome.com/img_big/funny-picture-9979524311.jpg"
 	mv *.jpg input.jpg
 fi
 
