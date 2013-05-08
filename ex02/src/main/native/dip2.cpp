@@ -106,8 +106,9 @@ int main(int argc, char** argv) {
 // return: filtered image
 Mat averageFilter(const Mat& src, int kSize) {
 
-	// TODO
-	return src.clone();
+	static const Mat kernel = Mat::ones(kSize, kSize, src.type()) * (1.0 / kSize);
+
+	return spatialConvolution(src, kernel);
 }
 
 // the adaptive filter
