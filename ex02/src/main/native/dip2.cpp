@@ -190,7 +190,7 @@ Mat spatialConvolution(const Mat& src, const Mat& kernel) {
 
 	Mat res = Mat(src.size(), src.type());
 
-	const bool space = false;
+	const bool space = true;
 	if (space) {
 		const int kw = kernel.cols;
 		const int kh = kernel.rows;
