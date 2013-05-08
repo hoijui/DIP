@@ -147,8 +147,39 @@ Mat bilateralFilter(const Mat& src, int kSize, double sigma) {
 // return: convolution result
 Mat spatialConvolution(const Mat& src, const Mat& kernel) {
 
-	// TODO
-	return src.clone();
+	Mat res = Mat(src.size(), src.type());
+
+	const bool space = false;
+	if (space) {
+		const int kw = kernel.cols;
+		const int kh = kernel.rows;
+		const int kwHalf = (int) (kw / 2);
+		const int khHalf = (int) (kh / 2);
+		for (int x = 0; x < src.rows; ++x) { // image.x
+			for (int y = 0; y < src.cols; ++y) { // image.y
+				float newVal = 0.0f;
+				for (int kx = 0; kx < kernel.rows; ++kx) { // kernel.x
+					for (int ky = 0; ky < kernel.cols; ++ky) { // kernel.y
+						int imgX = x - kwHalf + kx;
+						imgX = max(imgX, -imgX);
+						int imgY = y - khHalf + ky;
+						imgY = max(imgY, -imgY);
+						newVal += src.at<float>(imgX, imgY) * kernel.at<float>(kx, ky);
+					}
+				}
+				res.at<float>(x, y) = newVal;
+			}
+		}
+	} else { // frequency
+		Mat freqSrc = Mat(src.size(), src.type());
+		Mat freqKernel = Mat(kernel.size(), kernel.type());
+		dft(src, freqSrc);
+		dft(kernel, freqKernel);
+		Mat freqRes = freqSrc * freqKernel;
+		dft(freqRes, res, DFT_INVERSE);
+	}
+
+	return res;
 }
 
 // ************************
