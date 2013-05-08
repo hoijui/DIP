@@ -23,6 +23,8 @@ Mat bilateralFilter(const Mat& src, int kSize, double sigma);
 Mat noiseReduction(Mat&, string, int, double=0);
 void generateNoisyImages(const Mat&);
 
+void insertionSort(float window[]);
+
 // usage: argv[1] == "generate" to generate noisy images, path to original image in argv[2]
 // 	  argv[1] == "restorate" to load and restorate noisy images
 int main(int argc, char** argv) {
@@ -125,74 +127,48 @@ Mat adaptiveFilter(const Mat& src, int kSize, double threshold) {
 // src: input image
 // kSize: window size used by median operation
 // return: filtered image
+Mat medianFilter(const Mat& src, int kSize) {
 
-Mat medianFilter(Mat& src, int kSize){
+	const int kwHalf = (int) (kSize / 2);
+	const int khHalf = (int) (kSize / 2);
 
-   // TO DO !!!
-//create a sliding window of size 9
+	Mat dst(src.size(), src.type());
+	float window[kSize * kSize];
+	for (int x = 0; x < src.cols; ++x) {
+		for (int y = 0; y < src.rows; ++y) {
+			int wi = 0;
+			for (int kx = 0; kx < kSize; ++kx) { // kernel.x
+				for (int ky = 0; ky < kSize; ++ky) { // kernel.y
+					int imgX = x - kwHalf + kx;
+					imgX = max(imgX, -imgX);
+					int imgY = y - khHalf + ky;
+					imgY = max(imgY, -imgY);
+					window[wi++] = src.at<float>(imgX, imgY);
+				}
+			}
 
-    kSize = 9;
+			// sort the window to find median
+			insertionSort(window);
 
-    cout << "median lalala" << endl;
+			// assign the median to centered element of the matrix
+			dst.at<float>(x, y) = window[(kSize * kSize) / 2];
+		}
+	}
 
-//    int row = src.rows;
-//    int col = src.cols;
-
-//    cout << row << endl;
-//    cout << col << endl;
-
-    Mat dst;
-    dst=src.clone();
-    int window[kSize];
-    for(int y = 0; y < src.rows; y++)
-                for(int x = 0; x < src.cols; x++)
-                    dst.at<uchar>(y,x) = 0.0;
-//            int counter = 0;
-
-            for(int y = 1; y < src.rows - 1; y++){
-                for(int x = 1; x < src.cols - 1; x++){
-
-                 // Pick up window element
-
-                    window[0] = src.at<uchar>(y - 1 ,x - 1);
-                    window[1] = src.at<uchar>(y, x - 1);
-                    window[2] = src.at<uchar>(y + 1, x - 1);
-                    window[3] = src.at<uchar>(y - 1, x);
-                    window[4] = src.at<uchar>(y, x);
-                    window[5] = src.at<uchar>(y + 1, x);
-                    window[6] = src.at<uchar>(y - 1, x + 1);
-                    window[7] = src.at<uchar>(y, x + 1);
-                    window[8] = src.at<uchar>(y + 1, x + 1);
-
-                   // sort the window to find median
-                   insertionSort(window);
-
-                    // assign the median to centered element of the matrix
-                    dst.at<uchar>(y,x) = window[4];
-                }
-            }
-
-         namedWindow("final");
-            imshow("final", dst);
-
-         namedWindow("initial");
-            imshow("initial", src);
-
-       waitKey();
-
-        return dst;
+	return dst;
 }
-// sortieren
-    void insertionSort(int window[]){
 
-    int temp, i , j;
-    for(i = 0; i < 9; i++){
-        temp = window[i];
-        for(j = i-1; j >= 0 && temp < window[j]; j--){
-            window[j+1] = window[j];
-        }
-        window[j+1] = temp;
-    }
+// sortieren
+void insertionSort(float window[]) {
+
+	int j = 0;
+	for (int i = 0; i < 9; i++) {
+		float temp = window[i];
+		for (j = i-1; j >= 0 && temp < window[j]; j--) {
+			window[j+1] = window[j];
+		}
+		window[j+1] = temp;
+	}
 }
 
 // the bilateral filter
