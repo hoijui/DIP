@@ -61,26 +61,12 @@
 \section{Theoretical}
 
 
+
+
+
 \newpage
 \section{Source Code:}
 
-\begin{lstlisting}[label=interstingFunction,caption=The function with the color-reduction code.]
-Mat doSomethingThatMyTutorIsGonnaLike(Mat& img) {
-
-	const int div = 64;
-	const int nl = img.rows;
-	const int nc = img.cols * img.channels();
-
-	for (int j = 0; j < nl; ++j) {
-		uchar* data = img.ptr<uchar>(j);
-		for (int i = 0; i < nc; ++i) {
-			data[i] = (data[i] / div * div) + (div / 2);
-		}
-	}
-
-	return img;
-}
-\end{lstlisting}
-\lstinputlisting[breaklines=true,label=theCode,caption=The code]{../native/dip2.cpp}
+\lstinputlisting[breaklines=true,label=lst:theCode,caption=The code]{../native/dip2.cpp}
 
 \end{document}
