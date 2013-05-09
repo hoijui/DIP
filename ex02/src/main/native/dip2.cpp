@@ -24,6 +24,7 @@ Mat noiseReduction(Mat&, string, int, double=0);
 void generateNoisyImages(const Mat&);
 
 void insertionSort(float window[]);
+void cropCoordinate(int& looseCoord, const int lowerBound, const int upperBound);
 
 // usage: argv[1] == "generate" to generate noisy images, path to original image in argv[2]
 // 	  argv[1] == "restorate" to load and restorate noisy images
@@ -144,9 +145,9 @@ Mat medianFilter(const Mat& src, int kSize) {
 			for (int kx = 0; kx < kw; ++kx) { // kernel.x
 				for (int ky = 0; ky < kh; ++ky) { // kernel.y
 					int imgX = x - kwHalf + kx;
-					imgX = max(imgX, -imgX);
+					cropCoordinate(imgX, 0, w);
 					int imgY = y - khHalf + ky;
-					imgY = max(imgY, -imgY);
+					cropCoordinate(imgY, 0, h);
 					window[wi++] = src.at<float>(imgX, imgY);
 				}
 			}
@@ -186,6 +187,20 @@ Mat bilateralFilter(const Mat& src, int kSize, double sigma) {
 	return src.clone();
 }
 
+/**
+ * Makes sure that the given coordinate coimes to lay within the bounds.
+ * This may be achieved by one of multiple border-handling techniques.
+ * We use edge mirroring here.
+ */
+void cropCoordinate(int& looseCoord, const int lowerBound, const int upperBound) {
+
+	if (looseCoord < lowerBound) {
+		looseCoord = lowerBound + (lowerBound - looseCoord);
+	} else if (looseCoord >= upperBound) {
+		looseCoord = upperBound - (upperBound + 1 - looseCoord);
+	}
+}
+
 // convolution in spatial domain
 // src: input image
 // kernel: filter kernel
@@ -208,9 +223,9 @@ Mat spatialConvolution(const Mat& src, const Mat& kernel) {
 				for (int kx = 0; kx < kw; ++kx) { // kernel.x
 					for (int ky = 0; ky < kh; ++ky) { // kernel.y
 						int imgX = x - kwHalf + kx;
-						imgX = max(imgX, -imgX);
+						cropCoordinate(imgX, 0, w);
 						int imgY = y - khHalf + ky;
-						imgY = max(imgY, -imgY);
+						cropCoordinate(imgY, 0, h);
 						newVal += src.at<float>(imgX, imgY) * kernel.at<float>(kx, ky);
 					}
 				}
