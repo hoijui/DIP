@@ -129,16 +129,20 @@ Mat adaptiveFilter(const Mat& src, int kSize, double threshold) {
 // return: filtered image
 Mat medianFilter(const Mat& src, int kSize) {
 
-	const int kwHalf = (int) (kSize / 2);
-	const int khHalf = (int) (kSize / 2);
+	const int w = src.rows;
+	const int h = src.cols;
+	const int kw = kSize;
+	const int kh = kSize;
+	const int kwHalf = (int) (kw / 2);
+	const int khHalf = (int) (kh / 2);
 
 	Mat dst(src.size(), src.type());
 	float window[kSize * kSize];
-	for (int x = 0; x < src.cols; ++x) {
-		for (int y = 0; y < src.rows; ++y) {
+	for (int x = 0; x < w; ++x) { // image.x
+		for (int y = 0; y < h; ++y) { // image.y
 			int wi = 0;
-			for (int kx = 0; kx < kSize; ++kx) { // kernel.x
-				for (int ky = 0; ky < kSize; ++ky) { // kernel.y
+			for (int kx = 0; kx < kw; ++kx) { // kernel.x
+				for (int ky = 0; ky < kh; ++ky) { // kernel.y
 					int imgX = x - kwHalf + kx;
 					imgX = max(imgX, -imgX);
 					int imgY = y - khHalf + ky;
@@ -192,15 +196,17 @@ Mat spatialConvolution(const Mat& src, const Mat& kernel) {
 
 	const bool space = true;
 	if (space) {
-		const int kw = kernel.cols;
-		const int kh = kernel.rows;
+		const int w = src.rows;
+		const int h = src.cols;
+		const int kw = kernel.rows;
+		const int kh = kernel.cols;
 		const int kwHalf = (int) (kw / 2);
 		const int khHalf = (int) (kh / 2);
-		for (int x = 0; x < src.rows; ++x) { // image.x
-			for (int y = 0; y < src.cols; ++y) { // image.y
+		for (int x = 0; x < w; ++x) { // image.x
+			for (int y = 0; y < h; ++y) { // image.y
 				float newVal = 0.0f;
-				for (int kx = 0; kx < kernel.rows; ++kx) { // kernel.x
-					for (int ky = 0; ky < kernel.cols; ++ky) { // kernel.y
+				for (int kx = 0; kx < kw; ++kx) { // kernel.x
+					for (int ky = 0; ky < kh; ++ky) { // kernel.y
 						int imgX = x - kwHalf + kx;
 						imgX = max(imgX, -imgX);
 						int imgY = y - khHalf + ky;
