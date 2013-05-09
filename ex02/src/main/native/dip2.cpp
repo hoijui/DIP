@@ -320,7 +320,7 @@ void generateNoisyImages(const Mat& orig) {
 	imwrite("noiseType_1.jpg", tmp1);
 
 	// second noise operation
-	noiseLevel = 50; //50;
+	noiseLevel = 50;
 	randn(tmp1, 0, noiseLevel);
 	tmp1 = orig + tmp1;
 	threshold(tmp1,tmp1,255,255,CV_THRESH_TRUNC);
