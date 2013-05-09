@@ -120,8 +120,23 @@ Mat averageFilter(const Mat& src, int kSize) {
 // return: filtered image
 Mat adaptiveFilter(const Mat& src, int kSize, double threshold) {
 
-	// TODO
-	return src.clone();
+	const int w = src.rows;
+	const int h = src.cols;
+
+	Mat res = averageFilter(src, kSize);
+	Mat origSmoothed3 = averageFilter(src, 3);
+	for (int x = 0 ; x < w; ++x) {
+		for (int y = 0; y < h; ++y) {
+			const float diff = abs(res.at<float>(x, y) - origSmoothed3.at<float>(x, y));
+			if (diff > threshold) {
+				// if the change of value exceeds the threshold,
+				// we use the original value
+				res.at<float>(x, y) = src.at<float>(x, y);
+			}
+		}
+	}
+
+	return res;
 }
 
 // the median filter
