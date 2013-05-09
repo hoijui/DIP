@@ -92,8 +92,8 @@ int main(int argc, char** argv) {
 		// ==> Choose appropriate noise reduction technique with appropriate parameters
 		// ==> "average" or "median"? Why?
 		// ==> try also "adaptive"
-		Mat restorated1 = noiseReduction(noise1, "", -1);
-		Mat restorated2 = noiseReduction(noise2, "", -1);
+		Mat restorated1 = noiseReduction(noise1, "median", 3);
+		Mat restorated2 = noiseReduction(noise2, "adaptive", 15, 30.0);
 
 		// save images
 		imwrite("restorated1.jpg", restorated1);
