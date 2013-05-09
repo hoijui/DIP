@@ -127,7 +127,7 @@ Mat adaptiveFilter(const Mat& src, int kSize, double threshold) {
 	Mat origSmoothed3 = averageFilter(src, 3);
 	for (int x = 0 ; x < w; ++x) {
 		for (int y = 0; y < h; ++y) {
-			const float diff = abs(res.at<float>(x, y) - origSmoothed3.at<float>(x, y));
+			const float diff = fabs((float)res.at<float>(x, y) - origSmoothed3.at<float>(x, y));
 			if (diff > threshold) {
 				// if the change of value exceeds the threshold,
 				// we use the original value
