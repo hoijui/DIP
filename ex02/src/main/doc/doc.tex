@@ -116,17 +116,19 @@ We can get a result like in fig. \ref{fig:restored2}.
 
 \subsection{2. Explain your answer to question 1.}
 
-TODO
+The median filter is a non-linear filter and belongs to the class of edge preserving smoothing filters. This filter is a very effective filter to remove shot noise because it would rank strong spikelike isolated values in the first or last places. The median filter takes the median value. Therefore, shot noises which have very strong or very low values wouldn't be taken and would be eliminated. 
 
+On the contrary, the moving average filter would factor spikelike isolated values into the process. A few very strong or very low values would change the result to a non acceptable one. 
+
+For Gaussian noise it is better to take the moving average filter. The median filter removes isolated noise pixels, but it does not smooth detail as much as the moving average filter. Smoothing blurs noise and detail which is recommended for Gaussian noise.
 
 \subsection{3. Is there a general better choice than the moving average filter?}
 
-TODO
-
+The Gaussian filter is a general better choice than the moving average filter.
 
 \subsection{4. Explain your answer to question 3.}
 
-TODO
+In general the Gaussian filter is the ideal smoothing filter. It is similar to the average mean filter, but it uses a different kernel. The Gaussian filter outputs a weighted average of the pixel's neighbourhood, with the average weighted more towards the value of the central pixels. Because of this, the result of the Gaussian filter is a gentler smoothing and a better preserving of the edges than the moving average filter.
 
 
 \newpage
