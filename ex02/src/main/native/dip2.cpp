@@ -216,7 +216,7 @@ Mat spatialConvolution(const Mat& src, const Mat& kernel) {
 		Mat freqKernel = Mat(kernel.size(), kernel.type());
 		dft(src, freqSrc);
 		dft(kernel, freqKernel);
-		Mat freqRes = freqSrc * freqKernel;
+		Mat freqRes = freqSrc * freqKernel; // FIXME This will obviously crash, because the kernel is much smaller then the image -> dimensions do not match
 		dft(freqRes, res, DFT_INVERSE);
 	}
 
