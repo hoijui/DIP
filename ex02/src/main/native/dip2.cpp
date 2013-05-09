@@ -156,7 +156,8 @@ Mat medianFilter(const Mat& src, int kSize) {
 			insertionSort(window);
 
 			// assign the median to centered element of the matrix
-			dst.at<float>(x, y) = window[(kSize * kSize) / 2];
+			const float median = window[(kSize * kSize) / 2];
+			dst.at<float>(x, y) = median;
 		}
 	}
 
