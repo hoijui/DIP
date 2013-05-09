@@ -4,6 +4,7 @@
 \usepackage[utf8x]{inputenc}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{subfigure}
 \usepackage{multirow}
 \usepackage{listings}
 \usepackage{subfigure}
@@ -62,6 +63,43 @@ See lst. \ref{lst:theCode}.
 
 
 \section{Theoretical}
+
+See the original image in fig. \ref{fig:original}.
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=0.4\textwidth]{\imgGeneratedRoot/original.jpg}
+	\caption{original image}
+	\label{fig:original}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+
+	\subfigure[shot noise]{
+		\includegraphics[width=0.4\textwidth]{\imgGeneratedRoot/noiseType_1.jpg}
+		\label{fig:noiseTypeShot}
+	}
+	\subfigure[shot noise restored with median filter ($k = 3$)]{
+		\includegraphics[width=0.4\textwidth]{\imgGeneratedRoot/restorated1.jpg}
+		\label{fig:restored1}
+	}
+
+	\subfigure[Gaussian noise]{
+		\includegraphics[width=0.4\textwidth]{\imgGeneratedRoot/noiseType_2.jpg}
+		\label{fig:noiseTypeGauss}
+	}
+	\subfigure[Gaussian noise restored with moving average filter ($k = 15$, $\text{threshold} = 30.0$)]{
+		\includegraphics[width=0.4\textwidth]{\imgGeneratedRoot/restorated2.jpg}
+		\label{fig:restored2}
+	}
+
+	\caption[Optional caption for list of figures]{
+		noisy \& de-noised images \subref{fig:noiseTypeShot}, \subref{fig:noiseTypeGauss}
+	}
+	\label{fig:noiseAndRestored}
+\end{figure}
+
 
 \subsection{1. When should the median filter be applied to an image and when the moving average filter?}
 
