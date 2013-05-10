@@ -226,7 +226,28 @@ kernel		filter kernel
 return		output image
 */
 Mat frequencyConvolution(Mat& in, Mat& kernel) {
-	// TODO
+
+	const int kw = kernel.cols;
+	const int kh = kernel.rows;
+
+	Mat kernelBig = Mat::zeros(in.size(), in.type());
+	for (int x = 0; x < kw + 1; ++x) {
+		for (int y = 0; y < kh + 1; ++y) {
+			kernelBig.at<float>(x, y) = kernel.at<float>(x, y);
+		}
+	}
+	circShift(kernelBig, kw/2, kh/2);
+
+	Mat freqIn = Mat(in.size(), in.type());
+	Mat freqKernel = Mat(kernelBig.size(), kernelBig.type());
+	Mat res = Mat(in.size(), in.type());
+	dft(in, freqIn);
+	dft(kernel, freqKernel);
+	Mat freqRes = freqIn * freqKernel;
+	dft(freqRes, res, DFT_INVERSE | DFT_SCALE);
+
+	return res;
+}
 }
 
 /*
