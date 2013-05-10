@@ -190,7 +190,33 @@ dy	shift in y-direction
 return	circular shifted matrix
 */
 Mat circShift(Mat& in, int dx, int dy) {
-	// TODO
+
+	const int h = in.rows;
+	const int w = in.cols;
+
+	Mat res = Mat::zeros(h, w, in.type());
+
+	for (int y = 0; y < h; ++y) {
+		int yNew = y + dy;
+		if (yNew < 0) {
+			yNew = yNew + h;
+		} else if (yNew >= h) {
+			yNew = yNew - h;
+		}
+
+		for (int x = 0; x < w; ++x) {
+			int xNew = x + dx;
+			if (xNew < 0) {
+				xNew = xNew + w;
+			} else if (xNew >= w) {
+				xNew = xNew - w;
+			}
+
+			res.at<float>(yNew, xNew) = in.at<float>(y, x);
+		}
+	}
+
+	return res;
 }
 
 /*
