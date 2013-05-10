@@ -22,14 +22,7 @@ fi
 
 cd "${TARGET_DIR}"
 
-ARGUMENTS="generate ${RESOURCES_DIR}/img/input.jpg"
-
-# generate noisy images
-if [ ! -f "original.jpg" ]; then
-	"${EXECUTABLE}" ${ARGUMENTS}
-fi
-
-ARGUMENTS="restorate"
+ARGUMENTS="${RESOURCES_DIR}/img/input.jpg"
 
 if [ "${2}" = "debug" ]; then
 	echo "ARGUMENTS: ${ARGUMENTS}"
