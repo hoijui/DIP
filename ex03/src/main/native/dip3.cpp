@@ -159,7 +159,27 @@ kSize:		kernel size (used to calculate standard deviation)
 return:		the generated filter kernel
 */
 Mat createGaussianKernel(int kSize) {
-	// TODO
+
+	Mat kernel = Mat::zeros(kSize, kSize, CV_32FC1);
+
+	const int kh = kSize / 2;
+	const float sigma = kSize / 5.0f;
+	const float sigmaSqr = sigma * sigma;
+	const float gaussMul = 1.0f / (2 * M_PI * sigma * sigma);
+
+	for (int x = 0; x < kh + 1; ++x) {
+		for (int y = 0; y < kh + 1; ++y) {
+			// calculate gaussian value
+			const float curVal = gaussMul * exp(0.5f * ((x*x + y*y) / sigmaSqr));
+			// ... and copy it to each quarter
+			kernel.at<float>(kh + x, kh + y) = curVal;
+			kernel.at<float>(kh - x, kh + y) = curVal;
+			kernel.at<float>(kh + x, kh - y) = curVal;
+			kernel.at<float>(kh - x, kh - y) = curVal;
+		}
+	}
+
+	return kernel;
 }
 
 /*
