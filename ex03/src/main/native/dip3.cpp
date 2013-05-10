@@ -25,6 +25,8 @@ Mat usm(Mat& in, int smoothType, int size, double thresh, double scale);
 // function headers of given functions
 Mat mySmooth(Mat& in, int size, bool spatial);
 
+void cropCoordinate(int& looseCoord, const int lowerBound, const int upperBound);
+
 // usage: path to image in argv[1]
 int main(int argc, char** argv) {
 
@@ -248,6 +250,19 @@ Mat frequencyConvolution(Mat& in, Mat& kernel) {
 
 	return res;
 }
+
+/**
+ * Makes sure that the given coordinate coimes to lay within the bounds.
+ * This may be achieved by one of multiple border-handling techniques.
+ * We use edge mirroring here.
+ */
+void cropCoordinate(int& looseCoord, const int lowerBound, const int upperBound) {
+
+	if (looseCoord < lowerBound) {
+		looseCoord = lowerBound + (lowerBound - looseCoord);
+	} else if (looseCoord >= upperBound) {
+		looseCoord = upperBound - (upperBound + 1 - looseCoord);
+	}
 }
 
 /*
@@ -257,7 +272,32 @@ kernel		filter kernel
 return		output image
 */
 Mat spatialConvolution(Mat& in, Mat& kernel) {
-	// TODO
+
+	Mat res = Mat(in.size(), in.type());
+
+	const int w = in.rows;
+	const int h = in.cols;
+	const int kw = kernel.rows;
+	const int kh = kernel.cols;
+	const int kwHalf = (int) (kw / 2);
+	const int khHalf = (int) (kh / 2);
+	for (int x = 0; x < w; ++x) { // image.x
+		for (int y = 0; y < h; ++y) { // image.y
+			float newVal = 0.0f;
+			for (int kx = 0; kx < kw; ++kx) { // kernel.x
+				for (int ky = 0; ky < kh; ++ky) { // kernel.y
+					int imgX = x - kwHalf + kx;
+					cropCoordinate(imgX, 0, w);
+					int imgY = y - khHalf + ky;
+					cropCoordinate(imgY, 0, h);
+					newVal += in.at<float>(imgX, imgY) * kernel.at<float>(kx, ky);
+				}
+			}
+			res.at<float>(x, y) = newVal;
+		}
+	}
+
+	return res;
 }
 
 
