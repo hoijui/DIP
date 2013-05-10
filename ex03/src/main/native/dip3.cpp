@@ -313,7 +313,25 @@ scale		scaling of edge enhancement
 return		enhanced image
 */
 Mat usm(Mat& in, int type, int size, double thresh, double scale) {
-	// TODO
+
+	const bool spatial = (type == 0); // TODO
+	Mat diff = mySmooth(in, size, spatial);
+	diff -= in;
+	diff *= scale;
+	Mat res = in - diff;
+
+	const int w = in.rows;
+	const int h = in.cols;
+	for (int x = 0; x < w; ++x) { // image.x
+		for (int y = 0; y < h; ++y) { // image.y
+			// reset to input if the difference is below the threshold
+			if (diff.at<float>(x, y) < thresh) {
+				res.at<float>(x, y) = in.at<float>(x, y);
+			}
+		}
+	}
+
+	return res;
 }
 
 /*
