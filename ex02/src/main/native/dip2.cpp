@@ -24,7 +24,7 @@ Mat noiseReduction(Mat&, string, int, double=0);
 void generateNoisyImages(const Mat&);
 
 void insertionSort(float window[]);
-void cropCoordinate(int& looseCoord, const int lowerBound, const int upperBound);
+void cropCoordinate(int& coord, const int lowerBound, const int upperBound);
 
 // usage: argv[1] == "generate" to generate noisy images, path to original image in argv[2]
 // 	  argv[1] == "restorate" to load and restorate noisy images
@@ -208,12 +208,12 @@ Mat bilateralFilter(const Mat& src, int kSize, double sigma) {
  * This may be achieved by one of multiple border-handling techniques.
  * We use edge mirroring here.
  */
-void cropCoordinate(int& looseCoord, const int lowerBound, const int upperBound) {
+void cropCoordinate(int& coord, const int lowerBound, const int upperBound) {
 
-	if (looseCoord < lowerBound) {
-		looseCoord = lowerBound + (lowerBound - looseCoord);
-	} else if (looseCoord >= upperBound) {
-		looseCoord = upperBound - (upperBound + 1 - looseCoord);
+	if (coord < lowerBound) {
+		coord = lowerBound + (lowerBound - coord);
+	} else if (coord >= upperBound) {
+		coord = upperBound - (coord - upperBound + 1);
 	}
 }
 
