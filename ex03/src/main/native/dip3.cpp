@@ -25,7 +25,7 @@ Mat usm(Mat& in, int smoothType, int size, double thresh, double scale);
 // function headers of given functions
 Mat mySmooth(Mat& in, int size, bool spatial);
 
-void cropCoordinate(int& looseCoord, const int lowerBound, const int upperBound);
+void cropCoordinate(int& coord, const int lowerBound, const int upperBound);
 
 // usage: path to image in argv[1]
 int main(int argc, char** argv) {
@@ -262,12 +262,12 @@ Mat frequencyConvolution(Mat& in, Mat& kernel) {
  * This may be achieved by one of multiple border-handling techniques.
  * We use edge mirroring here.
  */
-void cropCoordinate(int& looseCoord, const int lowerBound, const int upperBound) {
+void cropCoordinate(int& coord, const int lowerBound, const int upperBound) {
 
-	if (looseCoord < lowerBound) {
-		looseCoord = lowerBound + (lowerBound - looseCoord);
-	} else if (looseCoord >= upperBound) {
-		looseCoord = upperBound - (upperBound + 1 - looseCoord);
+	if (coord < lowerBound) {
+		coord = lowerBound + (lowerBound - coord);
+	} else if (coord >= upperBound) {
+		coord = upperBound - (coord - upperBound + 1);
 	}
 }
 
