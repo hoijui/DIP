@@ -320,11 +320,11 @@ return		enhanced image
 */
 Mat usm(Mat& in, int type, int size, double thresh, double scale) {
 
-	const bool spatial = (type == 0); // TODO
+	const bool spatial = (type == 0);
 	Mat diff = mySmooth(in, size, spatial);
 	diff -= in;
 	diff *= scale;
-	Mat res = in - diff;
+	Mat res = in + diff;
 
 	const int w = in.rows;
 	const int h = in.cols;
