@@ -17,12 +17,16 @@ if [ ! -f "${RESOURCES_DIR}/img/input.jpg" ]; then
 	mkdir -p "${RESOURCES_DIR}/img"
 	cd "${RESOURCES_DIR}/img/"
 	wget "${SRC_IMG_URL}"
-	mv *.jpg input.jpg
+	mv *.jpg "input.jpg"
+fi
+
+if [ ! -f "${TARGET_DIR}/input.jpg" ]; then
+	cp "${RESOURCES_DIR}/img/input.jpg" "${TARGET_DIR}"
 fi
 
 cd "${TARGET_DIR}"
 
-ARGUMENTS="${RESOURCES_DIR}/img/input.jpg"
+ARGUMENTS="${TARGET_DIR}/input.jpg"
 
 if [ "${2}" = "debug" ]; then
 	echo "ARGUMENTS: ${ARGUMENTS}"
