@@ -1,6 +1,6 @@
 
 SET(exNum 3)
- 
+
 PROJECT(dip${exNum})
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.4)
@@ -10,6 +10,7 @@ SET(NATIVE_SRC_ROOT "src/main/native")
 INCLUDE_DIRECTORIES(${NATIVE_SRC_ROOT})
 
 SET(src_files
+	"${NATIVE_SRC_ROOT}/main.cpp"
 	"${NATIVE_SRC_ROOT}/dip${exNum}.cpp"
 	)
 
