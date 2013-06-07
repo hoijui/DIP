@@ -40,8 +40,38 @@
 
 \maketitle
 
+See the input in fig. \ref{fig:input},
+the degraded version in fig. \ref{fig:degraded},
+the USM difference to the degraded image in fig. \ref{fig:difference},
+and the USM-enhanced image in fig. \ref{fig:enhanced},
 
 
+\begin{figure}[ht]
+	\centering
+
+	\subfigure[input]{
+		\includegraphics[width=0.45\textwidth]{\imgGeneratedRoot/input.jpg}
+		\label{fig:input}
+	}
+	\subfigure[degraded]{
+		\includegraphics[width=0.45\textwidth]{\imgGeneratedRoot/dedgraded.png}
+		\label{fig:degraded}
+	}
+
+	\subfigure[difference (kernel size: 25 x 25)]{
+		\includegraphics[width=0.45\textwidth]{\imgGeneratedRoot/input_USM_25x25_frequencyDomain_diff2original.png}
+		\label{fig:difference}
+	}
+	\subfigure[enhanced (kernel size: 25 x 25)]{
+		\includegraphics[width=0.45\textwidth]{\imgGeneratedRoot/input_USM_25x25_frequencyDomain_enhanced.png}
+		\label{fig:enhanced}
+	}
+
+% 	\caption[Optional caption for list of figures]{
+% 		noisy \& de-noised images \subref{fig:noiseTypeShot}, \subref{fig:noiseTypeGauss}
+% 	}
+	\label{fig:images}
+\end{figure}
 
 
 \newpage
