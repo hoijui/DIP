@@ -240,13 +240,13 @@ Mat frequencyConvolution(Mat& in, Mat& kernel) {
 			kernelBig.at<float>(x, y) = kernel.at<float>(x, y);
 		}
 	}
-	circShift(kernelBig, kw/2, kh/2);
+	Mat kernelBigShifted = circShift(kernelBig, -(kw/2), -(kh/2));
 
 	// transform into frequency domain
 	Mat freqIn = Mat(in.size(), CV_32FC2); // complex
-	Mat freqKernel = Mat(kernelBig.size(), CV_32FC2); // complex
+	Mat freqKernel = Mat(kernelBigShifted.size(), CV_32FC2); // complex
 	dft(in, freqIn);
-	dft(kernelBig, freqKernel);
+	dft(kernelBigShifted, freqKernel);
 
 	// multiply in frequency domain (-> convolute in spatial domain)
 	Mat freqRes = Mat(kernelBig.size(), CV_32FC2); // complex
