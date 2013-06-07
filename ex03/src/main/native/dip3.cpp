@@ -171,6 +171,7 @@ Mat createGaussianKernel(int kSize) {
 	const float sigmaSqr = sigma * sigma;
 	const float gaussMul = 1.0f / (2 * M_PI * sigma * sigma);
 
+	float integral = 0.0f;
 	for (int x = 0; x < kSize; ++x) {
 		for (int y = 0; y < kSize; ++y) {
 			// calculate gaussian coordinates
@@ -180,8 +181,10 @@ Mat createGaussianKernel(int kSize) {
 			const float curVal = gaussMul * exp(-0.5f * ((gX*gX + gY*gY) / sigmaSqr));
 			// store it
 			kernel.at<float>(x, y) = curVal;
+			integral += curVal;
 		}
 	}
+	cout << "Kernel integral (should be ~= 1.0f): " << integral << endl;
 
 	return kernel;
 }
