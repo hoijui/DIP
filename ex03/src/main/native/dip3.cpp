@@ -346,7 +346,7 @@ Mat usm(Mat& in, int type, int size, double thresh, double scale) {
 				newVal = res.at<float>(x, y);
 				htt++;
 			}
-			res.at<float>(x, y) = min(max(newVal, 255.0f), 0.0f);
+			res.at<float>(x, y) = newVal;
 		}
 	}
 	cout << "higher then threshold: " << htt << "  /  lower: " << ltt << endl;
