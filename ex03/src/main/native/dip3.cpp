@@ -235,8 +235,8 @@ Mat frequencyConvolution(Mat& in, Mat& kernel) {
 	const int kh = kernel.rows;
 
 	Mat kernelBig = Mat::zeros(in.size(), in.type());
-	for (int x = 0; x < kw + 1; ++x) {
-		for (int y = 0; y < kh + 1; ++y) {
+	for (int x = 0; x < kw; ++x) {
+		for (int y = 0; y < kh; ++y) {
 			kernelBig.at<float>(x, y) = kernel.at<float>(x, y);
 		}
 	}
