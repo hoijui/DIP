@@ -47,8 +47,8 @@ int main(int argc, char** argv) {
 
 	// parameter of USM
 	int numberOfKernelSizes = 10;			// number of differently sized smoothing kernels
-	double thresh = 350.0;				// TODO threshold on difference necessary to perform operation
-	double scale = 0.05;				// TODO scaling of edge enhancement
+	double thresh = 2.0;				// TODO threshold on difference necessary to perform operation
+	double scale = 3.0;				// TODO scaling of edge enhancement
 
 	// load image, path in argv[1]
 	cout << "load image" << endl;
