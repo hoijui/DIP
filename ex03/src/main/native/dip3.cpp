@@ -164,20 +164,22 @@ Mat createGaussianKernel(int kSize) {
 
 	Mat kernel = Mat::zeros(kSize, kSize, CV_32FC1);
 
-	const int kh = kSize / 2;
+	const int ksh = kSize / 2;
+	const int muX = ksh;
+	const int muY = ksh;
 	const float sigma = kSize / 5.0f;
 	const float sigmaSqr = sigma * sigma;
 	const float gaussMul = 1.0f / (2 * M_PI * sigma * sigma);
 
-	for (int x = 0; x < kh + 1; ++x) {
-		for (int y = 0; y < kh + 1; ++y) {
+	for (int x = 0; x < kSize; ++x) {
+		for (int y = 0; y < kSize; ++y) {
+			// calculate gaussian coordinates
+			const int gX = x - muX;
+			const int gY = y - muY;
 			// calculate gaussian value
-			const float curVal = gaussMul * exp(0.5f * ((x*x + y*y) / sigmaSqr));
-			// ... and copy it to each quarter
-			kernel.at<float>(kh + x, kh + y) = curVal;
-			kernel.at<float>(kh - x, kh + y) = curVal;
-			kernel.at<float>(kh + x, kh - y) = curVal;
-			kernel.at<float>(kh - x, kh - y) = curVal;
+			const float curVal = gaussMul * exp(-0.5f * ((gX*gX + gY*gY) / sigmaSqr));
+			// store it
+			kernel.at<float>(x, y) = curVal;
 		}
 	}
 
