@@ -331,9 +331,13 @@ Mat usm(Mat& in, int type, int size, double thresh, double scale) {
 	for (int x = 0; x < w; ++x) { // image.x
 		for (int y = 0; y < h; ++y) { // image.y
 			// reset to input if the difference is below the threshold
+			float newVal;
 			if (diff.at<float>(x, y) < thresh) {
-				res.at<float>(x, y) = in.at<float>(x, y);
+				newVal = in.at<float>(x, y);
+			} else {
+				newVal = res.at<float>(x, y);
 			}
+			res.at<float>(x, y) = min(max(newVal, 255.0f), 0.0f);
 		}
 	}
 
