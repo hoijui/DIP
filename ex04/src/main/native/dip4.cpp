@@ -31,5 +31,28 @@ void createKernel(Mat& kernel, int kSize, string name) {
 
 void circShift(Mat& in, Mat& out, int dx, int dy) {
 
-	// TODO copy from ex03
+	const int h = in.rows;
+	const int w = in.cols;
+
+//	out = Mat::zeros(h, w, in.type());
+
+	for (int y = 0; y < h; ++y) {
+		int yNew = y + dy;
+		if (yNew < 0) {
+			yNew = yNew + h;
+		} else if (yNew >= h) {
+			yNew = yNew - h;
+		}
+
+		for (int x = 0; x < w; ++x) {
+			int xNew = x + dx;
+			if (xNew < 0) {
+				xNew = xNew + w;
+			} else if (xNew >= w) {
+				xNew = xNew - w;
+			}
+
+			out.at<float>(yNew, xNew) = in.at<float>(y, x);
+		}
+	}
 }
