@@ -16,7 +16,7 @@
 
 Mat inverseFilter(Mat& degraded, Mat& filter) {
 
-	const float epsilon = 0.05f;
+	const float epsilon = 0.09f;
 
 	const Mat& s = degraded;
 	const Mat& p = filter;
@@ -32,15 +32,23 @@ Mat inverseFilter(Mat& degraded, Mat& filter) {
 	Mat pBigShifted(s.size(), s.type());
 	circShift(pBig, pBigShifted, -(kw/2), -(kh/2));
 
-	TODO;
-	add imaginary part/channel to the pBigShifted matrix,
-			to get complex putput from the DFT
+	//	TODO;
+	//	add imaginary part/channel to the pBigShifted matrix,
+	//			to get complex putput from the DFT
+	Mat empty = Mat::zeros(pBigShifted.size(), pBigShifted.type());
+	vector<Mat> pBigShiftedChannels;
+	pBigShiftedChannels.push_back(pBigShifted);
+	pBigShiftedChannels.push_back(empty);
+	Mat pBigShiftedCompl(pBigShifted.size(), CV_32FC2);
+	merge(pBigShiftedChannels, pBigShiftedCompl);
 
 	// transform into frequency domain
 	Mat S(s.size(), CV_32FC2); // complex
 	Mat P(pBigShifted.size(), CV_32FC2); // complex
-	dft(s, S, DFT_COMPLEX_OUTPUT);
-	dft(pBigShifted, P, DFT_COMPLEX_OUTPUT);
+//	dft(s, S, DFT_COMPLEX_OUTPUT);
+//	dft(pBigShifted, P, DFT_COMPLEX_OUTPUT);
+	dft(s, S);
+	dft(pBigShifted, P);
 
 	const int w = P.rows;
 	const int h = P.cols;
@@ -61,10 +69,18 @@ Mat inverseFilter(Mat& degraded, Mat& filter) {
 	// see DIP04_ST13_wiener.pdf page 12
 	const float epsMaxAbsP = epsilon * PiAbsMax;
 
-	Mat Q(Pabs.size(), CV_32FC2);
 	Mat Preciproce(P.size(), CV_32FC2);
-	divide(1.0, P, Preciproce); // TODO: check if a complex valued division is done here
+//	divide(1.0, P, Preciproce); // NOTE this would not do correct complex division
+	for (int x = 0; x < w; ++x) {
+		for (int y = 0; y < h; ++y) {
+			const Vec2f& Pi = P.at<Vec2f>(x, y);
+			const float a2Nb2 = (Pi[0] * Pi[0]) + (Pi[1] * Pi[1]);
+			Preciproce.at<Vec2f>(x, y)[0] =  Pi[0] / a2Nb2;
+			Preciproce.at<Vec2f>(x, y)[1] = -Pi[1] / a2Nb2;
+		}
+	}
 
+	Mat Q(Pabs.size(), CV_32FC2);
 	for (int x = 0; x < w; ++x) {
 		for (int y = 0; y < h; ++y) {
 			const float PiAbs = Pabs.at<float>(x, y);
@@ -81,6 +97,8 @@ Mat inverseFilter(Mat& degraded, Mat& filter) {
 	// multiply with the inverse model of the distortion
 	// (== convolute in spacial domain)
 	Mat O_approx(P.size(), P.type());
+	cout << "S: " << S.size[0] << "*" << S.size[1] << endl;
+	cout << "Q: " << Q.size[0] << "*" << Q.size[1] << endl;
 	multiply(S, Q, O_approx);
 
 	// transform back into spatial domain
