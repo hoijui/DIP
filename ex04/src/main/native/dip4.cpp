@@ -32,6 +32,10 @@ Mat inverseFilter(Mat& degraded, Mat& filter) {
 	Mat pBigShifted(s.size(), s.type());
 	circShift(pBig, pBigShifted, -(kw/2), -(kh/2));
 
+	TODO;
+	add imaginary part/channel to the pBigShifted matrix,
+			to get complex putput from the DFT
+
 	// transform into frequency domain
 	Mat S(s.size(), CV_32FC2); // complex
 	Mat P(pBigShifted.size(), CV_32FC2); // complex
@@ -59,7 +63,7 @@ Mat inverseFilter(Mat& degraded, Mat& filter) {
 
 	Mat Q(Pabs.size(), CV_32FC2);
 	Mat Preciproce(P.size(), CV_32FC2);
-	divide(1.0, P, Preciproce);
+	divide(1.0, P, Preciproce); // TODO: check if a complex valued division is done here
 
 	for (int x = 0; x < w; ++x) {
 		for (int y = 0; y < h; ++y) {
@@ -68,7 +72,7 @@ Mat inverseFilter(Mat& degraded, Mat& filter) {
 			if (PiAbs >= epsMaxAbsP) {
 				Qi = Preciproce.at<Vec2f>(x, y);
 			} else {
-				Qi[0] = epsMaxAbsP;
+				Qi[0] = 1.0f / epsMaxAbsP;
 			}
 			Q.at<Vec2f>(x, y) = Qi;
 		}
