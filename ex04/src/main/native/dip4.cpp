@@ -41,27 +41,17 @@ Mat inverseFilter(Mat& degraded, Mat& filter) {
 //	dft(pBigShifted, P);
 
 
-	const int w = src.rows;
-	const int h = src.cols;
-	const int kw = kernel.rows;
-	const int kh = kernel.cols;
-	const int kwHalf = (int) (kw / 2);
-	const int khHalf = (int) (kh / 2);
+	const int w = P.rows;
+	const int h = P.cols;
+//	float PiAbsMax = 0.0f;
 	for (int x = 0; x < w; ++x) { // image.x
 		for (int y = 0; y < h; ++y) { // image.y
-			float newVal = 0.0f;
-			for (int kx = 0; kx < kw; ++kx) { // kernel.x
-				for (int ky = 0; ky < kh; ++ky) { // kernel.y
-					int imgX = x - kwHalf + kx;
-					cropCoordinate(imgX, 0, w);
-					int imgY = y - khHalf + ky;
-					cropCoordinate(imgY, 0, h);
-					newVal += src.at<float>(imgX, imgY) * kernel.at<float>(kx, ky);
-				}
-			}
-			res.at<float>(x, y) = newVal;
+			float* Pi = P.at<float*>(x, y);
+			float PiAbs = sqrt((Pi[0] * Pi[0]) + (Pi[1] * Pi[1]));
+			Pabs.at<float>(x, y) = PiAbs;
 		}
 	}
+	float PiAbsMax = max(PiAbsMax);
 
 
 
