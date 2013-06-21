@@ -41,6 +41,41 @@
 \maketitle
 
 
+See the input in fig. \ref{fig:original},
+the degraded version in fig. \ref{fig:degraded},
+and the version restored with our inverse-filter in fig. \ref{fig:restoredInverse}.
+
+As you can see,
+the filter seems not yet to be implemented correctly.
+There might be something wrong with the inverse FFT,
+due to the non-standard, non-compressed complex Mat format we use,
+or the way we converted the $\epsilon max(|P_i|)$ value to a complex number
+(simply using it as the real part), or something else ...
+
+
+\begin{figure}[ht]
+	\centering
+
+	\subfigure[original]{
+		\includegraphics[width=0.45\textwidth]{\imgGeneratedRoot/original.png}
+		\label{fig:original}
+	}
+	\subfigure[degraded]{
+		\includegraphics[width=0.45\textwidth]{\imgGeneratedRoot/degraded.png}
+		\label{fig:degraded}
+	}
+
+	\subfigure[restored inverse]{
+		\includegraphics[width=0.45\textwidth]{\imgGeneratedRoot/restored_inverse.png}
+		\label{fig:restoredInverse}
+	}
+% 	\subfigure[restored wiener]{
+% 		\includegraphics[width=0.45\textwidth]{\imgGeneratedRoot/restored_wiener.png}
+% 		\label{fig:restoredWiener}
+% 	}
+	\label{fig:images}
+\end{figure}
+
 
 \newpage
 \section{Source Code:}
