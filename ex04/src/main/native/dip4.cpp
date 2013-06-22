@@ -47,8 +47,10 @@ Mat inverseFilter(Mat& degraded, Mat& filter) {
 	Mat P(pBigShifted.size(), CV_32FC2); // complex
 //	dft(s, S, DFT_COMPLEX_OUTPUT);
 //	dft(pBigShifted, P, DFT_COMPLEX_OUTPUT);
-	dft(s, S);
-	dft(pBigShifted, P);
+//	dft(s, S);
+	dft(s, S, DFT_COMPLEX_OUTPUT);
+//	dft(pBigShifted, P);
+	dft(pBigShiftedCompl, P);
 
 	const int w = P.rows;
 	const int h = P.cols;
@@ -97,13 +99,14 @@ Mat inverseFilter(Mat& degraded, Mat& filter) {
 	// multiply with the inverse model of the distortion
 	// (== convolute in spacial domain)
 	Mat O_approx(P.size(), P.type());
-	cout << "S: " << S.size[0] << "*" << S.size[1] << endl;
-	cout << "Q: " << Q.size[0] << "*" << Q.size[1] << endl;
+	cout << "S: " << S.size[0] << "*" << S.size[1] << " - " << S.type() << endl;
+	cout << "Q: " << Q.size[0] << "*" << Q.size[1] << " - " << Q.type() << endl;
 	multiply(S, Q, O_approx);
 
 	// transform back into spatial domain
 	Mat o_approx(O_approx.size(), CV_32FC1);
-	dft(O_approx, o_approx, DFT_INVERSE| DFT_SCALE | DFT_REAL_OUTPUT);
+//	dft(O_approx, o_approx, DFT_INVERSE| DFT_SCALE | DFT_REAL_OUTPUT);
+	dft(O_approx, o_approx, DFT_INVERSE| DFT_SCALE);
 
 	return o_approx;
 }
