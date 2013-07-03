@@ -44,8 +44,8 @@ int main(int argc, char** argv) {
     img = imread(argv[1]);
     drawKeypoints(img, points, img, Scalar(0,0,255), DrawMatchesFlags::DRAW_OVER_OUTIMG + DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
     showImage(img, "keypoints", 0, true, true);
-    return 0;
 
+    return 0;
 }
 
 
@@ -70,7 +70,7 @@ void showImage(Mat& img, const char* win, int wait, bool show, bool save){
     }
     // save
     if (save)
-      imwrite( (string("img/") + string(win)+string(".png")).c_str(), aux);
+	  imwrite( (string(win)+string(".png")).c_str(), aux);
 }
 
 void nonMaxSuppression(Mat& img, Mat& out){
