@@ -40,15 +40,52 @@
 
 \maketitle
 
-See the result in fig. \ref{fig:keypoints}.
-Even though it is suggested to use a $w_{\text{min}}$ of 0.5 till 1.5,
-we had to use a value of 30.0 or higher, to get usable results.
+It was suggested to use a $w_{\text{min}}$ of 0.5 till 1.5,
+which results in output like in
+fig. \ref{fig:keypoints_1_05} or
+fig. \ref{fig:keypoints_1_075}.
+This is probably well suited for further processing with automatic image analysis techniques.
+For the human eye, output with $w_{\text{min}}$ at 40.0 or higher,
+as can be seen in
+fig. \ref{fig:keypoints_40_05} or
+fig. \ref{fig:keypoints_40_075},
+makes more sense.
 
-\begin{figure}[ht]
+See all the result in fig. \ref{fig:keypoints}.
+
+
+\begin{figure}[htp]
 	\centering
-	\includegraphics[width=0.7\textwidth]{\imgGeneratedRoot/keypoints.png}
+
+	\subfigure[$w_{\text{min}} = 1.0$, $q_{\text{min}} = 0.5$]{
+		\includegraphics[width=0.45\textwidth]{\imgGeneratedRoot/keypoints_1_05.png}
+		\label{fig:keypoints_1_05}
+	}
+	\subfigure[$w_{\text{min}} = 1.0$, $q_{\text{min}} = 0.75$]{
+		\includegraphics[width=0.45\textwidth]{\imgGeneratedRoot/keypoints_1_075.png}
+		\label{fig:keypoints_1_075}
+	}
+
+	\subfigure[$w_{\text{min}} = 40.0$, $q_{\text{min}} = 0.5$]{
+		\includegraphics[width=0.45\textwidth]{\imgGeneratedRoot/keypoints_40_05.png}
+		\label{fig:keypoints_40_05}
+	}
+	\subfigure[$w_{\text{min}} = 40.0$, $q_{\text{min}} = 0.75$]{
+		\includegraphics[width=0.45\textwidth]{\imgGeneratedRoot/keypoints_40_05.png}
+		\label{fig:keypoints_40_075}
+	}
+
+	\subfigure[$w_{\text{min}} = 100.0$, $q_{\text{min}} = 0.5$]{
+		\includegraphics[width=0.45\textwidth]{\imgGeneratedRoot/keypoints_100_05.png}
+		\label{fig:keypoints_100_05}
+	}
+	\subfigure[$w_{\text{min}} = 100.0$, $q_{\text{min}} = 0.75$]{
+		\includegraphics[width=0.45\textwidth]{\imgGeneratedRoot/keypoints_100_075.png}
+		\label{fig:keypoints_100_075}
+	}
+
 	\caption{
-		The key-points found with $w_{\text{min}} = 60.0$ and $q_{\text{min}} = 0.6$.
+		Keypoint results for different threshold values.
 	}
 	\label{fig:keypoints}
 \end{figure}
