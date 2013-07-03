@@ -63,8 +63,11 @@ void spatialConvolution(Mat& in, Mat& out, Mat& kernel){
 
 void getInterestPoints(Mat& img, double sigma, vector<KeyPoint>& points) {
 
-	Mat devXK, devYK, gauss;
+	const int kernelSize = 9;
 	cout << "I-Points!" << endl;
+	Mat devXK(kernelSize, kernelSize, img.type());
+	Mat devYK(kernelSize, kernelSize, img.type());
+	Mat gauss(kernelSize, kernelSize, img.type());
 	createFstDevKernel(gauss, 2*sigma);
 	createFstDevKernel(devXK, sigma);
 	cv::transpose(devXK, devYK);
@@ -153,8 +156,12 @@ void createFstDevKernel(Mat& kernel, double sigma) {
 			const float yv = y - hh;
 			const float commonFac = exp((xv*xv + yv*yv) / sigma22) / sigma4Pi;
 			// see DIP05_ST13_interest.pdf page 10
-			kernel.at<Vec2f>(x, y)[0] = -xv * commonFac; // partial derivative towards x
-			kernel.at<Vec2f>(x, y)[1] = -yv * commonFac; // partial derivative towards y
+			if (kernel.type() == CV_32FC2) {
+				kernel.at<Vec2f>(x, y)[0] = -xv * commonFac; // partial derivative towards x
+				kernel.at<Vec2f>(x, y)[1] = -yv * commonFac; // partial derivative towards y
+			} else {
+				kernel.at<float>(x, y) = -xv * commonFac; // partial derivative towards x
+			}
 		}
 	}
 }
