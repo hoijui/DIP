@@ -15,219 +15,222 @@
 #include "dip5.hpp"
 
 
-static Mat circShift(Mat& in, int dx, int dy) {
+static void cropCoordinate(int& coord, const int lowerBound, const int upperBound) {
 
-	const int h = in.rows;
-	const int w = in.cols;
+	if (coord < lowerBound) {
+		coord = lowerBound + (lowerBound - coord);
+	} else if (coord >= upperBound) {
+		coord = upperBound - (coord - upperBound + 1);
+	}
+}
 
-	Mat res = Mat::zeros(h, w, in.type());
+static Mat spatialConvolution(const  Mat& in, const  Mat& kernel) {
 
-	for (int y = 0; y < h; ++y) {
-		int yNew = y + dy;
-		if (yNew < 0) {
-			yNew = yNew + h;
-		} else if (yNew >= h) {
-			yNew = yNew - h;
-		}
+	Mat res = Mat(in.size(), in.type());
 
-		for (int x = 0; x < w; ++x) {
-			int xNew = x + dx;
-			if (xNew < 0) {
-				xNew = xNew + w;
-			} else if (xNew >= w) {
-				xNew = xNew - w;
+	const int w = in.rows;
+	const int h = in.cols;
+	const int kw = kernel.rows;
+	const int kh = kernel.cols;
+	const int kwHalf = (int) (kw / 2);
+	const int khHalf = (int) (kh / 2);
+	for (int x = 0; x < w; ++x) { // image.x
+		for (int y = 0; y < h; ++y) { // image.y
+			float newVal = 0.0f;
+			for (int kx = 0; kx < kw; ++kx) { // kernel.x
+				for (int ky = 0; ky < kh; ++ky) { // kernel.y
+					int imgX = x - kwHalf + kx;
+					cropCoordinate(imgX, 0, w);
+					int imgY = y - khHalf + ky;
+					cropCoordinate(imgY, 0, h);
+					newVal += in.at<float>(imgX, imgY) * kernel.at<float>(kx, ky);
+				}
 			}
-
-			res.at<float>(yNew, xNew) = in.at<float>(y, x);
+			res.at<float>(x, y) = newVal;
 		}
 	}
 
 	return res;
 }
 
-static Mat frequencyConvolution(Mat& in, Mat& kernel) {
+static void makeProbability(Mat& matrix) {
 
-	const int kw = kernel.cols;
-	const int kh = kernel.rows;
-
-	Mat kernelBig = Mat::zeros(in.size(), in.type());
-	for (int x = 0; x < kw; ++x) {
-		for (int y = 0; y < kh; ++y) {
-			kernelBig.at<float>(x, y) = kernel.at<float>(x, y);
-		}
-	}
-	Mat kernelBigShifted = circShift(kernelBig, -(kw/2), -(kh/2));
-
-	// transform into frequency domain
-	Mat freqIn = Mat(in.size(), CV_32FC2); // complex
-	Mat freqKernel = Mat(kernelBigShifted.size(), CV_32FC2); // complex
-	dft(in, freqIn);
-	dft(kernelBigShifted, freqKernel);
-
-	// multiply in frequency domain (-> convolute in spatial domain)
-	Mat freqRes = Mat(kernelBig.size(), CV_32FC2); // complex
-	mulSpectrums(freqIn, freqKernel, freqRes, 0);
-
-	// transform back into spatial domain
-	Mat res(in.size(), in.type());
-	dft(freqRes, res, DFT_INVERSE | DFT_SCALE);
-
-	return res;
+	const float absSum = cv::sum(cv::sum(abs(matrix)))[0];
+	matrix = matrix / absSum;
 }
 
-void applyKernelAt(Mat& in, Mat& out, Mat& kernel, int row, int col){
+static int gaussSigmaToKernelSize(const double sigma) {
 
-	float total = 0;
-	int rowCoord, colCoord;
-	int kerCenterRowShift = kernel.rows / 2;
-	int kerCenterColShift = kernel.cols / 2;
+	const int kSize = (((int)ceil(sigma * 3.0)) * 2) + 1;
+	return kSize;
+}
 
-	for(int i = 0; i < kernel.rows; i++){
-		for(int j = 0; j < kernel.cols; j++){
+static Mat createGaussianKernel(Mat& kernel, const double sigma) {
 
-			rowCoord = row - kerCenterRowShift + i;
-			colCoord = col - kerCenterColShift + j;
+	const int kSizeW = kernel.rows;
+	const int kSizeH = kernel.cols;
+	const int muX = kSizeW / 2;
+	const int muY = kSizeH / 2;
+	const float sigmaSqr = sigma * sigma;
+	const float gaussMul = 1.0f / (2.0f * M_PI * sigmaSqr);
+	float normalizer = -1.0f / (2.0f * sigmaSqr);
 
-			// correct coordinates at borders (move them inside the image again)
-			rowCoord = rowCoord < 0 ? abs(rowCoord) : rowCoord;
-			rowCoord = rowCoord >= in.rows ? (2*in.rows-1) - rowCoord : rowCoord;
-			colCoord = colCoord < 0 ? abs(colCoord) : colCoord;
-			colCoord = colCoord >= in.cols? (2*in.cols-1) - colCoord : colCoord;
+	float integral = 0.0f;
+	for (int x = 0; x < kSizeW; ++x) {
+		for (int y = 0; y < kSizeH; ++y) {
+			// calculate gaussian coordinates
+			const int gX = x - muX;
+			const int gY = y - muY;
+			// calculate the gaussian value
+			const float curVal = gaussMul * exp((gX*gX + gY*gY) * normalizer);
+			// store it
+			kernel.at<float>(x, y) = curVal;
+			integral += curVal;
+		}
+	}
+	cout << "Kernel integral (should be ~= 1.0f): " << integral << endl;
 
-			//now sum up stuff according to kernel and superimposed pixel value
-			total += kernel.at<float>(i,j) * in.at<float>(rowCoord,colCoord);
+	// ... just in case it is not, make it so!
+	makeProbability(kernel);
+
+	return kernel;
+}
+
+static Mat createGaussianKernel(const int kSize) {
+
+	const float sigma = kSize / 5.0f;
+	Mat kernel(1, kSize, CV_32FC1);
+	createGaussianKernel(kernel, sigma);
+	return kernel;
+}
+
+static Mat createGaussianKernel(const double sigma) {
+
+	const int kSize = gaussSigmaToKernelSize(sigma);
+	Mat kernel(1, kSize, CV_32FC1);
+	createGaussianKernel(kernel, sigma);
+	return kernel;
+}
+
+
+
+void createFstDevKernel(Mat& kernel, const double sigma) {
+
+	const int w = kernel.rows;
+	const int h = kernel.cols;
+	const float sigmaSqr = sigma * sigma;
+	const float sigma22 = 2 * sigmaSqr;
+	const float sigma4Pi = 2 * M_PI * sigmaSqr * sigmaSqr;
+	const float hw = (w / 2);
+	const float hh = (h / 2);
+	for (int x = 0; x < w; ++x) {
+		const float xv = x - hw;
+		for (int y = 0; y < h; ++y) {
+			const float yv = y - hh;
+			const float commonFac = exp(-(xv*xv + yv*yv) / sigma22) / sigma4Pi;
+
+			// see DIP05_ST13_interest.pdf page 10
+			if (kernel.type() == CV_32FC2) {
+				kernel.at<Vec2f>(x, y)[0] = -xv * commonFac; // partial derivative towards x
+				kernel.at<Vec2f>(x, y)[1] = -yv * commonFac; // partial derivative towards y
+			} else {
+				kernel.at<float>(x, y) = -yv * commonFac; // partial derivative towards y
+			}
 		}
 	}
 
-	//done summing up over a region in the input image, writing to output.
-	out.at<float>(row,col) = total;
+	makeProbability(kernel);
 }
 
-// spatial convolution
-/*
-in		input image
-out		output image
-kernel		the convolution kernel
-phi		orientation
-*/
-void spatialConvolution(Mat& in, Mat& out, Mat& kernel){
-	for(int row = 0; row < in.rows; row++)
-	{
-		for(int col = 0; col < in.cols; col++)
-		{
-			applyKernelAt(in,out,kernel,row,col);
-		}
-	}
+static Mat createFstDevKernel(const double sigma) {
+
+	const int kSize = gaussSigmaToKernelSize(sigma);
+	Mat kernel(1, kSize, CV_32FC1);
+
+	createFstDevKernel(kernel, sigma);
+
+	return kernel;
 }
+
 
 void getInterestPoints(Mat& img, double sigma, vector<KeyPoint>& points) {
 
-	const int kernelSize = 9;
-	cout << "I-Points!" << endl;
-	Mat devXK(kernelSize, kernelSize, img.type());
-	Mat devYK(kernelSize, kernelSize, img.type());
-	Mat gauss(kernelSize, kernelSize, img.type());
-	createFstDevKernel(gauss, 2*sigma);
-	createFstDevKernel(devXK, sigma);
-	cv::transpose(devXK, devYK);
+	cout << "Interest Points calculation" << endl;
 
-	cout << "Gradients!" << endl;
-	Mat gradX = Mat::zeros(img.size(), CV_32FC1);
-	Mat gradY = Mat::zeros(img.size(), CV_32FC1);
+	cout << "initialize stuff" << endl;
+	Mat gauss = createGaussianKernel(2*sigma);
+	Mat devXK = createFstDevKernel(sigma);
+	Mat devYK;
+	transpose(devXK, devYK);
 
-	// then calculate the gradients
-	cout << "Gradients 1!" << endl;
-//	spatialConvolution(img,gradX,devXK);
-	gradX = frequencyConvolution(img, devYK);
-	//showImage(gradX, "gX", 0, true, devXK);
-//	spatialConvolution(img,gradY,devYK);
-	gradY = frequencyConvolution(img, devYK);
-	//showImage(gradY, "gY", 0, true, true);
 
-	cout << "Gradients 2!" << endl;
-	Mat gXX, gYY,gXY,avgGXY, trace, det, temp, w, wnms, q, qnms;
-	Mat gYYs = Mat::zeros(img.size(), CV_32FC1);
-	Mat gXXs = Mat::zeros(img.size(), CV_32FC1);
-	Mat gXYs = Mat::zeros(img.size(), CV_32FC1);
+	cout << "calculate the x- and y-gradients" << endl;
+	Mat gradX = spatialConvolution(img, devXK);
+	Mat gradY = spatialConvolution(img, devYK);
 
+	Mat gXX;
+	Mat gYY;
+	Mat gXY;
 	multiply(gradX, gradY, gXY);
 	multiply(gradX, gradX, gXX);
 	multiply(gradY, gradY, gYY);
 
-	cout << "Gradients 3!" << endl;
-//	spatialConvolution(gXX,gXXs,gauss);
-//	spatialConvolution(gYY,gYYs,gauss);
-//	spatialConvolution(gXY,gXYs,gauss);
-	gXXs = frequencyConvolution(gXX, gauss);
-	gYYs = frequencyConvolution(gYY, gauss);
-	gXYs = frequencyConvolution(gXY, gauss);
+	Mat gXXs = spatialConvolution(gXX, gauss);
+	Mat gYYs = spatialConvolution(gYY, gauss);
+	Mat gXYs = spatialConvolution(gXY, gauss);
 
-	cout << "Trace!" << endl;
-	// trace
+
+	cout << "calculate the trace" << endl;
+	// see DIP05_ST13_interest.pdf page 22
+	Mat trace;
 	add(gXXs, gYY, trace);
-	
-	//showImage(trace, "trace", 0, true, true);
 
-	// determinant
-	cout << "Determinant!" << endl;
+
+	cout << "calculate the determinant" << endl;
+	// see DIP05_ST13_interest.pdf page 22
+	Mat det;
+	Mat temp;
 	multiply(gXXs, gYYs, det);
-	//showImage(det, "xxyy", 0, true, true);
 	multiply(gXYs, gXYs, temp);
-//	showImage(temp, "xyxy", 0, true, true);
 	subtract(det, temp, det);
-	//showImage(det, "det", 0, true, true);
 
-	// weight
-	cout << "Weight!" << endl;
+
+	cout << "calculate the weight" << endl;
+	// Strength of gradients in the neighborhood
+	// see DIP05_ST13_interest.pdf page 22
+	Mat w;
 	divide(det, trace, w);
-	nonMaxSuppression(w, wnms);
-	showImage(wnms, "wmns", 0, true, true);
+	Mat wNoMax;
+	nonMaxSuppression(w, wNoMax);
 
-	// isodings
-	cout << "Isodings!" << endl;
-	multiply(trace,trace,temp);
-	divide(4*det,temp,q);
-	nonMaxSuppression(q,qnms);
-	showImage(qnms, "qmns", 0, true, true);
 
-	cout << "Thresholding!" << endl;
-	float threshW = 100;
-	float threshQ = 0.8;
-	for(int x=0; x<img.rows; x++){
-		for(int y=0; y<img.cols; y++){
-			if (qnms.at<float>(x,y) >= threshQ && wnms.at<float>(x,y) >= threshW)
+	cout << "calculate the isotropy" << endl;
+	// Measures the uniformity of gradient directions in the neighbourhood
+	// see DIP05_ST13_interest.pdf page 22
+	multiply(trace, trace, temp);
+	Mat q;
+	divide(4*det, temp, q);
+	Mat qNoMax;
+	nonMaxSuppression(q, qNoMax);
+
+
+	cout << "do the thresholding" << endl;
+	// XXX why do we have to choose wMin so high?
+	const float wMin = 70.0; // 0.5 ... 1.5
+	const float qMin = 0.5; // 0.5 ... 0.75
+	const float wMinActual = wMin * mean(wNoMax)[0];
+	for (int x = 0; x < img.rows; ++x) {
+		for (int y = 0; y < img.cols; ++y) {
+			if ((qNoMax.at<float>(x, y) >= qMin)
+					&& (wNoMax.at<float>(x, y) >= wMinActual))
 			{
 				KeyPoint kp;
 				kp.pt.x = y;
 				kp.pt.y = x;
 				kp.angle = 0;
 				kp.size = 3;
-				kp.response = wnms.at<float>(x,y);
+				kp.response = wNoMax.at<float>(x, y);
 				points.push_back(kp);
-			}
-		}
-	}
-}
-
-void createFstDevKernel(Mat& kernel, double sigma) {
-
-	const int w = kernel.rows;
-	const int h = kernel.cols;
-	const float sigma22 = 2 * sigma * sigma;
-	const float sigma4Pi = 2 * M_PI * sigma * sigma * sigma * sigma;
-	const float hw = (w / 2) + 0.5f;
-	const float hh = (h / 2) + 0.5f;
-	for (int x = 0; x < w; ++x) {
-		const float xv = x - hw;
-		for (int y = 0; y < h; ++y) {
-			const float yv = y - hh;
-			const float commonFac = exp((xv*xv + yv*yv) / sigma22) / sigma4Pi;
-			// see DIP05_ST13_interest.pdf page 10
-			if (kernel.type() == CV_32FC2) {
-				kernel.at<Vec2f>(x, y)[0] = -xv * commonFac; // partial derivative towards x
-				kernel.at<Vec2f>(x, y)[1] = -yv * commonFac; // partial derivative towards y
-			} else {
-				kernel.at<float>(x, y) = -xv * commonFac; // partial derivative towards x
 			}
 		}
 	}
