@@ -15,6 +15,65 @@
 #include "dip5.hpp"
 
 
+static Mat circShift(Mat& in, int dx, int dy) {
+
+	const int h = in.rows;
+	const int w = in.cols;
+
+	Mat res = Mat::zeros(h, w, in.type());
+
+	for (int y = 0; y < h; ++y) {
+		int yNew = y + dy;
+		if (yNew < 0) {
+			yNew = yNew + h;
+		} else if (yNew >= h) {
+			yNew = yNew - h;
+		}
+
+		for (int x = 0; x < w; ++x) {
+			int xNew = x + dx;
+			if (xNew < 0) {
+				xNew = xNew + w;
+			} else if (xNew >= w) {
+				xNew = xNew - w;
+			}
+
+			res.at<float>(yNew, xNew) = in.at<float>(y, x);
+		}
+	}
+
+	return res;
+}
+
+static Mat frequencyConvolution(Mat& in, Mat& kernel) {
+
+	const int kw = kernel.cols;
+	const int kh = kernel.rows;
+
+	Mat kernelBig = Mat::zeros(in.size(), in.type());
+	for (int x = 0; x < kw; ++x) {
+		for (int y = 0; y < kh; ++y) {
+			kernelBig.at<float>(x, y) = kernel.at<float>(x, y);
+		}
+	}
+	Mat kernelBigShifted = circShift(kernelBig, -(kw/2), -(kh/2));
+
+	// transform into frequency domain
+	Mat freqIn = Mat(in.size(), CV_32FC2); // complex
+	Mat freqKernel = Mat(kernelBigShifted.size(), CV_32FC2); // complex
+	dft(in, freqIn);
+	dft(kernelBigShifted, freqKernel);
+
+	// multiply in frequency domain (-> convolute in spatial domain)
+	Mat freqRes = Mat(kernelBig.size(), CV_32FC2); // complex
+	mulSpectrums(freqIn, freqKernel, freqRes, 0);
+
+	// transform back into spatial domain
+	Mat res(in.size(), in.type());
+	dft(freqRes, res, DFT_INVERSE | DFT_SCALE);
+
+	return res;
+}
 
 void applyKernelAt(Mat& in, Mat& out, Mat& kernel, int row, int col){
 
@@ -77,11 +136,15 @@ void getInterestPoints(Mat& img, double sigma, vector<KeyPoint>& points) {
 	Mat gradY = Mat::zeros(img.size(), CV_32FC1);
 
 	// then calculate the gradients
-	spatialConvolution(img,gradX,devXK);
-	//showImage(gradX, "gX", 0, true, true);
-	spatialConvolution(img,gradY,devYK);
+	cout << "Gradients 1!" << endl;
+//	spatialConvolution(img,gradX,devXK);
+	gradX = frequencyConvolution(img, devYK);
+	//showImage(gradX, "gX", 0, true, devXK);
+//	spatialConvolution(img,gradY,devYK);
+	gradY = frequencyConvolution(img, devYK);
 	//showImage(gradY, "gY", 0, true, true);
 
+	cout << "Gradients 2!" << endl;
 	Mat gXX, gYY,gXY,avgGXY, trace, det, temp, w, wnms, q, qnms;
 	Mat gYYs = Mat::zeros(img.size(), CV_32FC1);
 	Mat gXXs = Mat::zeros(img.size(), CV_32FC1);
@@ -91,9 +154,13 @@ void getInterestPoints(Mat& img, double sigma, vector<KeyPoint>& points) {
 	multiply(gradX, gradX, gXX);
 	multiply(gradY, gradY, gYY);
 
-	spatialConvolution(gXX,gXXs,gauss);
-	spatialConvolution(gYY,gYYs,gauss);
-	spatialConvolution(gXY,gXYs,gauss);
+	cout << "Gradients 3!" << endl;
+//	spatialConvolution(gXX,gXXs,gauss);
+//	spatialConvolution(gYY,gYYs,gauss);
+//	spatialConvolution(gXY,gXYs,gauss);
+	gXXs = frequencyConvolution(gXX, gauss);
+	gYYs = frequencyConvolution(gYY, gauss);
+	gXYs = frequencyConvolution(gXY, gauss);
 
 	cout << "Trace!" << endl;
 	// trace
