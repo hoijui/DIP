@@ -63,13 +63,13 @@ void spatialConvolution(Mat& in, Mat& out, Mat& kernel){
 
 void getInterestPoints(Mat& img, double sigma, vector<KeyPoint>& points) {
 
-	cout << "I-Points!\n";
 	Mat devXK, devYK, gauss;
+	cout << "I-Points!" << endl;
 	createFstDevKernel(gauss, 2*sigma);
 	createFstDevKernel(devXK, sigma);
 	cv::transpose(devXK, devYK);
 
-	cout << "Gradients!\n";
+	cout << "Gradients!" << endl;
 	Mat gradX = Mat::zeros(img.size(), CV_32FC1);
 	Mat gradY = Mat::zeros(img.size(), CV_32FC1);
 
@@ -92,14 +92,14 @@ void getInterestPoints(Mat& img, double sigma, vector<KeyPoint>& points) {
 	spatialConvolution(gYY,gYYs,gauss);
 	spatialConvolution(gXY,gXYs,gauss);
 
-	cout << "Trace!\n";
+	cout << "Trace!" << endl;
 	// trace
 	add(gXXs, gYY, trace);
 	
 	//showImage(trace, "trace", 0, true, true);
 
 	// determinant
-	cout << "Determinant!\n";
+	cout << "Determinant!" << endl;
 	multiply(gXXs, gYYs, det);
 	//showImage(det, "xxyy", 0, true, true);
 	multiply(gXYs, gXYs, temp);
@@ -108,19 +108,19 @@ void getInterestPoints(Mat& img, double sigma, vector<KeyPoint>& points) {
 	//showImage(det, "det", 0, true, true);
 
 	// weight
-	cout << "Weight!\n";
+	cout << "Weight!" << endl;
 	divide(det, trace, w);
 	nonMaxSuppression(w, wnms);
 	showImage(wnms, "wmns", 0, true, true);
 
 	// isodings
-	cout << "Isodings!\n";
+	cout << "Isodings!" << endl;
 	multiply(trace,trace,temp);
 	divide(4*det,temp,q);
 	nonMaxSuppression(q,qnms);
 	showImage(qnms, "qmns", 0, true, true);
 
-	cout << "Thresholding!\n";
+	cout << "Thresholding!" << endl;
 	float threshW = 100;
 	float threshQ = 0.8;
 	for(int x=0; x<img.rows; x++){
@@ -137,8 +137,6 @@ void getInterestPoints(Mat& img, double sigma, vector<KeyPoint>& points) {
 			}
 		}
 	}
-
-
 }
 
 void createFstDevKernel(Mat& kernel, double sigma) {
