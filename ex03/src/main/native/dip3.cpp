@@ -37,7 +37,7 @@ Mat createGaussianKernel(int kSize) {
 			integral += curVal;
 		}
 	}
-	cout << "Kernel integral (should be ~= 1.0f): " << integral << endl;
+//	cout << "Kernel integral (should be ~= 1.0f): " << integral << endl;
 
 	return kernel;
 }
@@ -202,7 +202,7 @@ Mat usm(Mat& in, int type, int size, double thresh, double scale) {
 			res.at<float>(x, y) = newVal;
 		}
 	}
-	cout << "higher then threshold: " << htt << "  /  lower: " << ltt << endl;
+//	cout << "higher then threshold: " << htt << "  /  lower: " << ltt << endl;
 
 	return res;
 }
