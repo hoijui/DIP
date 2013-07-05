@@ -40,6 +40,9 @@
 
 \maketitle
 
+
+\section{Quality of the result}
+
 See the input in fig. \ref{fig:input},
 the degraded version in fig. \ref{fig:degraded},
 the USM difference to the degraded image in fig. \ref{fig:difference},
@@ -70,9 +73,54 @@ and the USM-enhanced image in fig. \ref{fig:enhanced},
 % 	\caption[Optional caption for list of figures]{
 % 		noisy \& de-noised images \subref{fig:noiseTypeShot}, \subref{fig:noiseTypeGauss}
 % 	}
-	\label{fig:images}
+	\label{fig:imagesQuality}
 \end{figure}
 
+
+\section{Algorithmic performance}
+
+For convolution directly in the spacial domain,
+computation time grows linearly with the number of image pixels,
+and with the number of kernel pixels,
+respectively squared with the kernel size (side length),
+as can be seen in \ref{fig:plotSpacial}.
+
+For convolution through conversion into and back from the frequency domain,
+computation time also grows linearly with the number of image pixels,
+put stays constant for different kernel sizes,
+as can be seen in fig. \ref{fig:plotFrequency}.
+This makes sense, because we always first convert the kernel into an image
+of the size of the to-be-processed image (independent of the kernel size).
+From this point onwards, all calculations
+(DFT, multiplication of imageF and kernelF, IDFT)
+are kernel size independent.
+
+The raw experiment data for both algorithms can be seen in
+fig. \ref{fig:dataSpacial} and fig. \ref{fig:dataFrequency}.
+
+\begin{figure}[ht]
+	\includegraphics[width=0.9\textwidth]{\imgRoot/spacialDomainPlot.png}
+	\label{fig:plotSpacial}
+\end{figure}
+
+\begin{figure}[ht]
+	\includegraphics[width=0.9\textwidth]{\imgRoot/frequencyDomainPlot.png}
+	\label{fig:plotFrequency}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+
+	\subfigure[spacial domain data]{
+		\includegraphics[width=0.45\textwidth]{\imgRoot/spacialDomainData.png}
+		\label{fig:dataSpacial}
+	}
+	\subfigure[frequency domain data]{
+		\includegraphics[width=0.414\textwidth]{\imgRoot/frequencyDomainData.png}
+		\label{fig:dataFrequency}
+	}
+	\label{fig:data}
+\end{figure}
 
 \newpage
 \section{Source Code:}
